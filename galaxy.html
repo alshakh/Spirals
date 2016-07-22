@@ -1,0 +1,129 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>Galaxy</title>
+    <!--[if lt IE 9]>
+        <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+    <script src="p5.min.js"></script>
+    <script>
+        /**
+        GALAXY {
+            stars : ([orbit, timeOffset])[],
+            starColor : [R,G,B,T], // max 255
+            starRadius : number,
+            radius : number,
+            timeFactor : number,
+            highlightedStar : number,
+            highlightedColor: [R,G,B,T],
+            orbitRatio : number, // eccentricity
+            orbitAngleFactor : number, // spiral revolutions
+        }
+        */
+        var UNIVERSE_DIMENSION = [window.innerWidth,window.innerHeight];
+        //
+        var initialGalaxy = function() {
+            return {
+                stars : generateStars("LIKELY_IN_MIDDLE", 5000),
+                starColor : [0,0,0,20],
+                starRadius : 20,
+                orbitRatio : 0.9,
+                orbitAngleFactor : 3,
+                radius : 350,
+                timeFactor : 0.0005,
+                highlightedStar : -1,
+                highlightedColor : [255,0,0,255],
+            }
+        }
+        var generateStars = function(distributionType, starCount) {
+            var stars = [];
+            var tStar;
+            if(distributionType.toUpperCase() === "DISTANCE") { // same distance => same number
+                for (var i = 0 ; i < starCount ; i++ ) {
+                    tStar = [];
+                    tStar[0] = random();
+                    tStar[1] = random(1000);
+                    stars.push(tStar);
+                }
+            } else if (distributionType.toUpperCase() === "LIKELY_IN_MIDDLE") { // number of stars increases in the middle of the radius
+                for (var i = 0 ; i < starCount ; i++ ) {
+                    tStar = [];
+                    tStar[0] = (random()+random())/2;
+                    tStar[1] = random(1000);
+                    stars.push(tStar);
+                }
+            } else if (distributionType.toUpperCase() === "LINEAR_DISTANCE") { // number increases lineary with distance
+                console.error("NOT IMPLEMENTED");
+            } else if (distributionType.toUpperCase() === "LINEAR_AREA") { // number increases lineary with area
+                console.error("NOT IMPLEMENTED");
+            }
+            //
+            return stars;
+        }
+
+
+        //
+        var galaxy;
+        //
+        function setup() {
+            createCanvas(UNIVERSE_DIMENSION[0], UNIVERSE_DIMENSION[1]);
+            translate(UNIVERSE_DIMENSION[0]/2,UNIVERSE_DIMENSION[1]/2); // center origin
+            galaxy = initialGalaxy();
+        }
+        //
+        function draw() {
+            background(102);
+            //
+            noStroke();
+            fill(galaxy.starColor)
+            //
+            var absTime = millis()*galaxy.timeFactor;
+            var s;
+            var phi;
+            for(var i = 0 ; i < galaxy.stars.length ; i++) {
+                s = galaxy.stars[i];
+                phi = galaxy.orbitAngleFactor*PI*s[0];
+                push();
+                //
+                rotate(phi);
+                if(i === galaxy.highlightedStar) {
+                    // draw orbit
+                    noFill();
+                    stroke(galaxy.highlightedColor);
+                    ellipse(0,0,2*s[0]*galaxy.radius,2*s[0]*galaxy.radius*galaxy.orbitRatio);
+                    noStroke();
+                    fill(galaxy.highlightedColor);
+                    ellipse(
+                        s[0]*galaxy.radius*sin(absTime+s[1]),
+                        s[0]*galaxy.radius*galaxy.orbitRatio*cos(absTime+s[1]),
+                        galaxy.starRadius, galaxy.starRadius);
+                } else {
+                    ellipse(
+                        s[0]*galaxy.radius*sin(absTime+s[1]),
+                        s[0]*galaxy.radius*galaxy.orbitRatio*cos(absTime+s[1]),
+                        galaxy.starRadius, galaxy.starRadius);
+                }
+                //
+                pop();
+            }
+        }
+
+        function mouseClicked() {
+            if(galaxy.highlightedStar >= 0) {
+                galaxy.highlightedStar = -1;
+            } else {
+                galaxy.highlightedStar = Math.floor(random(galaxy.stars.length));
+            }
+        }
+    </script>
+</body>
+
+</html>
