@@ -9,9 +9,63 @@
     <!--[if lt IE 9]>
         <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    <style>
+        #message {
+            position: fixed;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 2; 
+        }
+        .collapsible {
+            background-color: #777;
+            color: white;
+            cursor: pointer;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .active, .collapsible:hover {
+            background-color: #555;
+        }
+
+        .content {
+            padding: 0 18px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+            background-color: #f1f1f1;
+        }
+
+    </style>
 </head>
 
 <body>
+    <div id="message">
+        <button class="collapsible">Show Information</button>
+        <div class="content">
+		<p>These spirals are only the result of the eleptical oribit of the objects; they don't actually exists; objects go in and out of them. Notice that the spirals never move they are fixed location and orientation, only the objects move.</p> <p><big>Click anywhere to show a random object location and orbit.</big></p> <p><a href='https://github.com/alshakh/Spirals'>Visit GitHub repo</a></p>
+        </div>
+    </div>
+    <script>
+	var msg = document.getElementById('message')
+        var cols = document.getElementsByClassName('collapsible')
+        for ( var i = 0 ; i < cols.length ; i++ ) {
+            cols[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var content = this.nextElementSibling;
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                } else {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                }
+            });
+        }
+    </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.0/p5.min.js"></script>
     <script>
@@ -33,11 +87,11 @@
         var initialGalaxy = function() {
             return {
                 stars : generateStars("LIKELY_IN_MIDDLE", 5000),
-                starColor : [0,0,0,20],
+                starColor : [256,256,256,20],
                 starRadius : 20,
                 orbitRatio : 0.9,
                 orbitAngleFactor : 3,
-                radius : 350,
+                radius : 400,
                 timeFactor : 0.0005,
                 highlightedStar : -1,
                 highlightedColor : [255,0,0,255],
@@ -68,19 +122,26 @@
             //
             return stars;
         }
-
-
         //
         var galaxy;
         //
         function setup() {
             createCanvas(UNIVERSE_DIMENSION[0], UNIVERSE_DIMENSION[1]);
+            document.getElementsByTagName("canvas")[0].addEventListener("click", highlightRandomStar)
             translate(UNIVERSE_DIMENSION[0]/2,UNIVERSE_DIMENSION[1]/2); // center origin
             galaxy = initialGalaxy();
         }
         //
+        function highlightRandomStar() {
+            if(galaxy.highlightedStar >= 0) {
+                galaxy.highlightedStar = -1;
+            } else {
+                galaxy.highlightedStar = Math.floor(random(galaxy.stars.length));
+            }
+        }
+        //
         function draw() {
-            background(102);
+            background(20);
             //
             noStroke();
             fill(galaxy.starColor)
@@ -116,14 +177,9 @@
             }
         }
 
-        function mouseClicked() {
-            if(galaxy.highlightedStar >= 0) {
-                galaxy.highlightedStar = -1;
-            } else {
-                galaxy.highlightedStar = Math.floor(random(galaxy.stars.length));
-            }
-        }
+
     </script>
+    
 </body>
 
 </html>
