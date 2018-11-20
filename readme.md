@@ -4,5 +4,5 @@ This is a visualization of galaxy spirals. Notice that every object is rotating 
 
 Created using the [p5js library](https://p5js.org).
 
-[Live Demo](https://alshakh.github.io/spirals/spirals.html)
+[Live Demo](spirals.html)
 
